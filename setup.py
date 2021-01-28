@@ -23,7 +23,7 @@ setup(
     author_email         = "jtunney@gmail.com",
     url                  = "https://github.com/jart/redisbayes",
     license              = "MIT",
-    install_requires     = ["redis"],
+    install_requires     = ["redis==3.5.3"],
     py_modules           = ["redisbayes", "ez_setup"],
     classifiers = [
         "Development Status :: 5 - Production/Stable",

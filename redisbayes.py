@@ -23,7 +23,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-ur"""
+r"""
 
     redisbayes
     ~~~~~~~~~~
@@ -143,9 +143,9 @@ successful greatest began including being all for close but
 
 
 def tidy(text):
-    if not isinstance(text, basestring):
+    if not isinstance(text, str):
         text = str(text)
-    if not isinstance(text, unicode):
+    if not isinstance(text, str):
         text = text.decode('utf8')
     text = text.lower()
     return re.sub(r'[\_.,<>:;~+|\[\]?`"!@#$%^&*()\s]', ' ', text, re.UNICODE)
@@ -184,11 +184,11 @@ class RedisBayes(object):
 
     def train(self, category, text):
         self.redis.sadd(self.prefix + 'categories', category)
-        for word, count in occurances(self.tokenizer(text)).iteritems():
+        for word, count in occurances(self.tokenizer(text)).items():
             self.redis.hincrby(self.prefix + category, word, count)
 
     def untrain(self, category, text):
-        for word, count in occurances(self.tokenizer(text)).iteritems():
+        for word, count in occurances(self.tokenizer(text)).items():
             cur = self.redis.hget(self.prefix + category, word)
             if cur:
                 new = int(cur) - count
@@ -204,7 +204,7 @@ class RedisBayes(object):
         score = self.score(text)
         if not score:
             return None
-        return sorted(score.iteritems(), key=lambda v: v[1])[-1][0]
+        return sorted(iter(score.items()), key=lambda v: v[1])[-1][0]
 
     def score(self, text):
         occurs = occurances(self.tokenizer(text))
@@ -214,7 +214,7 @@ class RedisBayes(object):
             if tally == 0:
                 continue
             scores[category] = 0.0
-            for word, count in occurs.iteritems():
+            for word, count in occurs.items():
                 score = self.redis.hget(self.prefix + category, word)
                 assert not score or score > 0, "corrupt bayesian database"
                 score = score or self.correction
