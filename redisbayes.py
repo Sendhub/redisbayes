@@ -210,6 +210,7 @@ class RedisBayes(object):
         occurs = occurances(self.tokenizer(text))
         scores = {}
         for category in self.redis.smembers(self.prefix + 'categories'):
+            category = category.decode("utf-8")
             tally = self.tally(category)
             if tally == 0:
                 continue
