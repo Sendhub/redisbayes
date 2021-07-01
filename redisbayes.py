@@ -217,9 +217,11 @@ class RedisBayes(object):
             scores[category] = 0.0
             for word, count in occurs.items():
                 score = self.redis.hget(self.prefix + category, word)
-                assert not score or score > 0, "corrupt bayesian database"
-                score = score or self.correction
-                scores[category] += math.log(float(score) / tally)
+                if score:
+                    score = int(score)
+                    assert not score or score > 0, "corrupt bayesian database"
+                    score = score or self.correction
+                    scores[category] += math.log(float(score) / tally)
         return scores
 
     def tally(self, category):
