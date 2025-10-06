@@ -13,9 +13,15 @@ the appropriate options to ``use_setuptools()``.
 
 This file can also be run as a script to install or upgrade setuptools.
 """
+import logging
+import os
 import sys
+from hashlib import md5
+
+#except ImportError: from md5 import md5
+
 DEFAULT_VERSION = "0.6c11"
-DEFAULT_URL     = "http://pypi.python.org/packages/%s/s/setuptools/" % sys.version[:3]
+DEFAULT_URL     = f"http://pypi.python.org/packages/{sys.version[:3]}/s/setuptools/"
 
 md5_data = {
     'setuptools-0.6b1-py2.3.egg': '8822caf901250d848b996b7f25c6e6ca',
@@ -62,25 +68,17 @@ md5_data = {
     'setuptools-0.6c9-py2.6.egg': 'ca37b1ff16fa2ede6e19383e7b59245a',
 }
 
-import sys, os
-from hashlib import md5
-#except ImportError: from md5 import md5
+
 
 def _validate_md5(egg_name, data):
     if egg_name in md5_data:
         digest = md5(data).hexdigest()
         if digest != md5_data[egg_name]:
-            print((
-                "md5 validation of %s failed!  (Possible download problem?)"
-                % egg_name
-            ), file=sys.stderr)
+            print((f"md5 validation of {egg_name} failed!  (Possible download problem?)"), file=sys.stderr)
             sys.exit(2)
     return data
 
-def use_setuptools(
-    version=DEFAULT_VERSION, download_base=DEFAULT_URL, to_dir=os.curdir,
-    download_delay=15
-):
+def use_setuptools(version=DEFAULT_VERSION, download_base=DEFAULT_URL, to_dir=os.curdir, download_delay=15):
     """Automatically find/download setuptools and make it available on sys.path
 
     `version` should be a valid setuptools version number that is available
@@ -96,21 +94,23 @@ def use_setuptools(
     def do_download():
         egg = download_setuptools(version, download_base, to_dir, download_delay)
         sys.path.insert(0, egg)
-        import setuptools; setuptools.bootstrap_install_from = egg
+        import setuptools
+        setuptools.bootstrap_install_from = egg
     try:
         import pkg_resources
     except ImportError:
-        return do_download()       
+        return do_download()
     try:
-        pkg_resources.require("setuptools>="+version); return
+        pkg_resources.require("setuptools>="+version)
+        return
     except pkg_resources.VersionConflict as e:
         if was_imported:
             print((
-            "The required version of setuptools (>=%s) is not available, and\n"
-            "can't be installed while this script is running. Please install\n"
-            " a more recent version first, using 'easy_install -U setuptools'."
-            "\n\n(Currently using %r)"
-            ) % (version, e.args[0]), file=sys.stderr)
+            f"The required version of setuptools (>={version}) is not available, and\n"
+            f"can't be installed while this script is running. Please install\n"
+            f" a more recent version first, using 'easy_install -U setuptools'."
+            f"\n\n(Currently using {e.args[0]})"
+            ), file=sys.stderr)
             sys.exit(2)
     except pkg_resources.DistributionNotFound:
         pass
@@ -129,16 +129,19 @@ def download_setuptools(
     with a '/'). `to_dir` is the directory where the egg will be downloaded.
     `delay` is the number of seconds to pause before an actual download attempt.
     """
-    import urllib.request, urllib.error, urllib.parse, shutil
-    egg_name = "setuptools-%s-py%s.egg" % (version,sys.version[:3])
+    import shutil
+    import urllib.error
+    import urllib.parse
+    import urllib.request
+    egg_name = f"setuptools-{version}-py{sys.version[:3]}.egg"
     url = download_base + egg_name
     saveto = os.path.join(to_dir, egg_name)
     src = dst = None
     if not os.path.exists(saveto):  # Avoid repeated downloads
         try:
-            from distutils import log
+
             if delay:
-                log.warn("""
+                logging.warning("""
 ---------------------------------------------------------------------------
 This script requires setuptools version %s to run (even to display
 help).  I will attempt to download it for you (from
@@ -153,16 +156,21 @@ I will start the download in %d seconds.
 and place it in this directory before rerunning this script.)
 ---------------------------------------------------------------------------""",
                     version, download_base, delay, url
-                ); from time import sleep; sleep(delay)
-            log.warn("Downloading %s", url)
+                )
+                from time import sleep
+                sleep(delay)
+            logging.warning(f"Downloading {url}", )
             src = urllib.request.urlopen(url)
             # Read/write all in one block, so we don't create a corrupt file
             # if the download is interrupted.
             data = _validate_md5(egg_name, src.read())
-            dst = open(saveto,"wb"); dst.write(data)
+            dst = open(saveto,"wb")
+            dst.write(data)
         finally:
-            if src: src.close()
-            if dst: dst.close()
+            if src:
+                src.close()
+            if dst:
+                dst.close()
     return os.path.realpath(saveto)
 
 

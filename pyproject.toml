@@ -1,0 +1,50 @@
+[build-system]
+# modern setuptools backend
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "redisbayes"
+# Set a static version here. If you prefer deriving it from the package,
+# see the setuptools_scm example further below.
+version = "0.0.23"
+description = "Naïve Bayesian Text Classifier on Redis"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.7"
+license = "MIT"
+authors = [
+  { name = "Justine Tunney", email = "jtunney@gmail.com" }
+]
+urls = { "Homepage" = "https://github.com/jart/redisbayes" }
+keywords = ["redis", "bayes", "classifier", "nlp", "text"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python",
+  "Topic :: Database",
+  "Topic :: Communications :: Email"
+]
+
+# runtime dependencies
+dependencies = [
+  "redis==6.4.0"
+]
+
+# If your package is a single-module package (py_modules), list it here.
+# This mirrors setup(..., py_modules=[...]) from setup.py
+# [project.packages]
+# empty on purpose — we'll tell setuptools the py_modules below via tool.setuptools
+# (keeps PEP 621 section tidy)
+
+
+[tool.setuptools]
+# Tell setuptools to treat these files as top-level single-file modules.
+py-modules = ["redisbayes", "ez_setup"]
+
+# Optional metadata for sdist/wheel filenames etc.
+[tool.setuptools.dynamic]
+# none used here — version is static in [project]
+
+# Helpful scripts (optional). Example: a convenience entrypoint (uncomment if needed).
+# [project.scripts]
+# redisbayes = "redisbayes:main"

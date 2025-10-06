@@ -75,9 +75,8 @@ r"""
 
 """
 
-import re
 import math
-
+import re
 
 __version__ = "0.1.3"
 
@@ -231,5 +230,6 @@ class RedisBayes(object):
 
 
 if __name__ == '__main__':
-    import doctest, sys
+    import doctest
+    import sys
     sys.exit(doctest.testmod()[0])
