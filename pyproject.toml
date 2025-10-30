@@ -27,7 +27,7 @@ classifiers = [
 
 # runtime dependencies
 dependencies = [
-  "redis==6.4.0"
+  "redis>=7.0.1"
 ]
 
 # If your package is a single-module package (py_modules), list it here.
